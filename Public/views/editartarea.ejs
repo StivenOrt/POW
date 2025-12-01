@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Editar tarea</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container py-4">
+      <div class="row">
+        <div class="col-12 col-md-8 offset-md-2">
+          <h2>Editar tarea: <%= tareaToEdit.titulo %></h2>
+          <form method="POST" action="/editar/<%= tareaToEdit.id_tarea %>">
+            <div class="mb-3">
+              <label for="titulo" class="form-label">Título</label>
+              <input id="titulo" name="titulo" class="form-control" required value="<%= tareaToEdit.titulo %>" />
+            </div>
+
+            <div class="mb-3">
+              <label for="descripcion" class="form-label">Descripción</label>
+              <textarea id="descripcion" name="descripcion" class="form-control" rows="4"><%= tareaToEdit.descripcion || '' %></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label for="fecha_entrega" class="form-label">Fecha de entrega</label>
+              <%
+                 let formattedDate = '';
+                  if (tareaToEdit.fecha_entrega) {
+                      let dateObj = new Date(tareaToEdit.fecha_entrega);
+                      if (!isNaN(dateObj.getTime())) {
+                          formattedDate = dateObj.toISOString().split('T')[0];
+                      }
+                 }
+             %>
+              <input id="fecha_entrega" name="fecha_entrega" type="date" class="form-control" value="<%= formattedDate %>" />
+            </div>
+
+            <div class="mb-3">
+              <label for="id_curso" class="form-label">Curso</label>
+              <select id="id_curso" name="id_curso" class="form-select" required>
+                <option value="">-- Selecciona un curso --</option>
+                <% if (courses && courses.length) { %>
+                  <% courses.forEach(function(c){ %>
+                    <option
+                        value="<%= c.id_curso %>"
+                        <%= (tareaToEdit.id_curso == c.id_curso) ? 'selected' : '' %>
+                        >
+                        <%= c.nombre_curso %>
+                  <% }) %>
+                <% } %>
+              </select>
+            </div>
+
+            <div class="d-flex gap-2">
+              <button class="btn btn-primary" type="submit">Guardar Cambios</button>
+              <a class="btn btn-secondary" href="/">Cancelar</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

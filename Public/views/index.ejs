@@ -24,7 +24,6 @@
                 <h1 class="h4">Tareas</h1>
                 <a href="/creartarea" id="createBtn" class="btn btn-outline-primary">Crear nueva tarea</a>
             </div>
-
             <div id="tasksContainer" class="row">
                 <% if (!tasks || tasks.length === 0) { %>
                     <div class="col-12">
@@ -32,24 +31,36 @@
                     </div>
                 <% } else { %>
                     <% tasks.forEach(function(t){ %>
+                        <% 
+                            const isCompleted = (t.completada && String(t.completada).toLowerCase() === 'si'); 
+                            const cardOpacityClass = isCompleted ? 'opacity-50' : '';
+                        %>
                         <div class="col-12 col-md-6 col-lg-4 mb-3">
-                            <div class="card h-100">
+                            <div class="card h-100 <%= cardOpacityClass %>">
                                 <div class="card-body">
+                                    <% if (!isCompleted) { %>
                                     <form method="POST" action="/tareas/<%= t.id_tarea %>/completar" style="display:inline">
                                         <button type="submit" class="btn btn-success">Completar tarea</button>
                                     </form>
-                                    <h3 class="card-title"><%= t.titulo|| 'Sin título' %></h3>
+                                    <% } else { %>
+                                        <span class="badge bg-success mb-2">Tarea Completada</span>
+                                        <% } %>
+                                    <h3 class="card-title"><%= t.titulo || 'Sin título' %></h3>
                                     <p class="card-text"><%= t.descripcion || '-' %></p>
                                     <p class="card-text"><strong>Docente:</strong> <%= t.nombre || '-' %></p>
                                     <p class="card-text"><strong>Curso:</strong> <%= t.nombre_curso || '-' %></p>
                                     <p class="card-text"><strong>Completada:</strong> <%= (t.completada) %></p>
-
                                 </div>
                                 <div class="card-footer d-flex justify-content-between align-items-center">
                                     <small class="text-muted"><%= (t.fecha_entrega) %></small>
                                     <div>
-                                        <a href="/editar/<%= t.id_tarea %>" class="btn btn-sm btn-outline-primary mb-1">Editar</a>
-                                        <a href="/eliminar/<%= t.id_tarea %>" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                                        <form method="GET" action="/editar/<%= t.id_tarea %>" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-outline-info mb-1" <%= isCompleted ? 'disabled' : '' %>>Editar</button>
+                                        </form>
+                                        <form method="POST" action="/tareas/<%= t.id_tarea %>/eliminar" style="display:inline;" 
+                                            onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta tarea?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" <%= isCompleted ? 'disabled' : '' %>>Eliminar</button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>

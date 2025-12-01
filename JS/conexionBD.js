@@ -14,7 +14,7 @@ let conexion=mysql.createConnection({
     host:"localhost",
     database:"tareas",
     user:"root",
-    password:"root",
+    password:"",
 })
 
 conexion.connect(function(error){
@@ -29,6 +29,17 @@ app.get('/', function(req, res){
     let sql = "Select t.*, c.nombre_curso, d.nombre from tareas t inner join cursos c on t.id_curso = c.id_curso inner join docentes d on d.id_docente = c.id_docente";
     conexion.query(sql, function(err, results){
         if(err) throw err;
+                try {
+            results.forEach(r => {
+                const date = r.fecha_entrega;
+                if (date) {
+                    const formatted = new Date(date);
+                    r.fecha_entrega_formatted = formatted.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
+                }
+            });
+        } catch (e) {
+            throw e;
+        }
         res.render('index', { tasks : results });
     });
 });
@@ -54,7 +65,7 @@ app.get('/creartarea', function(req, res){
             console.error('Error al obtener cursos:', err);
             return res.render('creartarea', { courses: [] });
         }
-        res.render('creartarea', { courses: cursos });
+        res.render('creartarea', { courses: cursos});
     });
 });
 
@@ -80,12 +91,6 @@ app.post('/tareas/:id/eliminar', function(req, res){
             console.error('Error comprobando estado de la tarea antes de eliminar:', errCheck);
             return res.status(500).send('Error al intentar eliminar la tarea.');
         }
-
-        if(resultsCheck.length > 0 && String(resultsCheck[0].completada).toLowerCase() === 'si'){
-            console.log(`Se intentó eliminar la tarea ID ${id} pero está marcada como completada. Operación cancelada.`);
-            return res.redirect('/');
-        }
-
         conexion.query(sql, [id], function(err, result){
         if(err){
             console.error('Error al eliminar tarea:', err);
@@ -120,11 +125,6 @@ app.get('/editar/:id', function(req, res){
         
         const tareaToEdit = resultTarea[0]; 
 
-        if(tareaToEdit && String(tareaToEdit.completada).toLowerCase() === 'si'){
-            console.log(`Intento de abrir editor para tarea ID ${id} que ya está completada. Redirigiendo.`);
-            return res.redirect('/');
-        }
-
         const sqlCursos = 'SELECT * FROM cursos';
 
         conexion.query(sqlCursos, function(errCursos, resultCursos){
@@ -156,11 +156,6 @@ app.post('/editar/:id', function(req, res){
         if(errCheck){
             console.error('Error comprobando estado de la tarea antes de editar:', errCheck);
             return res.status(500).send('Error al intentar editar la tarea.');
-        }
-
-        if(resultsCheck.length > 0 && String(resultsCheck[0].completada).toLowerCase() === 'si'){
-            console.log(`Intento de editar tarea ID ${id} que ya está completada. Operación cancelada.`);
-            return res.redirect('/');
         }
 
         conexion.query(sql, data, function(err, result){

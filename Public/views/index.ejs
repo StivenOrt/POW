@@ -52,14 +52,14 @@
                                     <p class="card-text"><strong>Completada:</strong> <%= (t.completada) %></p>
                                 </div>
                                 <div class="card-footer d-flex justify-content-between align-items-center">
-                                    <small class="text-muted"><%= (t.fecha_entrega) %></small>
+                                    <small class="text-muted"><%= (t.fecha_entrega_formatted) %></small>
                                     <div>
                                         <form method="GET" action="/editar/<%= t.id_tarea %>" style="display:inline;">
                                             <button type="submit" class="btn btn-sm btn-outline-info mb-1" <%= isCompleted ? 'disabled' : '' %>>Editar</button>
                                         </form>
                                         <form method="POST" action="/tareas/<%= t.id_tarea %>/eliminar" style="display:inline;" 
                                             onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta tarea?');">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" <%= isCompleted ? 'disabled' : '' %>>Eliminar</button>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
                                         </form>
                                     </div>
                                 </div>
@@ -69,7 +69,6 @@
                 <% } %>
             </div>
         </div>
-
         <!-- Bootstrap JavaScript Libraries -->
         <script
             src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"

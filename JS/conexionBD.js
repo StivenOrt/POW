@@ -30,17 +30,33 @@ app.get('/', function(req, res){
     conexion.query(sql, function(err, results){
         if(err) throw err;
                 try {
-            results.forEach(r => {
-                const date = r.fecha_entrega;
-                if (date) {
-                    const formatted = new Date(date);
-                    r.fecha_entrega_formatted = formatted.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
+                    results.forEach(r => {
+                        const date = r.fecha_entrega;
+                        if (date) {
+                            const formatted = new Date(date);
+                            r.fecha_entrega_formatted = formatted.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
+                        }
+                    });
+                } catch (e) {
+                    throw e;
                 }
-            });
-        } catch (e) {
-            throw e;
-        }
-        res.render('index', { tasks : results });
+
+                const totalCount = results.length;
+                const completedCount = results.filter(r => r.completada && String(r.completada).toLowerCase() === 'si').length;
+                const completionRate = totalCount ? Math.round((completedCount / totalCount) * 100) : 0;
+
+                let mensaje = undefined;
+                if (req.query && req.query.mensaje) {
+                    mensaje = 'Tarea creada correctamente';
+                }
+
+                res.render('index', { 
+                    tasks: results,
+                    totalCount: totalCount,
+                    completedCount: completedCount,
+                    completionRate: completionRate,
+                    mensaje: mensaje
+                });
     });
 });
 
@@ -77,7 +93,31 @@ app.post('/creartarea', function(req, res){
             console.error('Error al crear tarea:', err);
             return res.redirect('/creartarea');
         }
-        res.redirect('/');
+        res.redirect('/?mensaje=1');
+    });
+});
+
+app.get('/crearcurso', function(req, res){
+    const sqlDocentes = 'SELECT id_docente, nombre FROM docentes';
+    conexion.query(sqlDocentes, function(err, docentes){
+        if(err){
+            console.error('Error al obtener docentes:', err);
+            return res.status(500).send('Error al obtener docentes');
+        }
+        res.render('crearcurso', { docentes: docentes });
+    });
+});
+
+app.post('/crearcurso', function(req, res){
+    const { nombre_curso, id_docente } = req.body;
+    const sql = 'INSERT INTO cursos (nombre_curso, id_docente) VALUES (?, ?)';
+    const docenteVal = id_docente && id_docente !== '' ? id_docente : null;
+    conexion.query(sql, [nombre_curso, docenteVal], function(err, result){
+        if(err){
+            console.error('Error al crear curso:', err);
+            return res.status(500).send('Error al crear curso');
+        }
+        res.redirect('/creartarea');
     });
 });
 

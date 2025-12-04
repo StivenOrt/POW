@@ -1,0 +1,25 @@
+.tasks-box {
+    box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+    border-radius: 16px;
+    border: 1px solid #e9ecef;
+    background: #f8fafd;
+    padding: 28px;
+    margin-top: 32px;
+}
+
+.tasks-box #tasksContainer .card {
+    box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+    border-radius: 10px;
+    border: 1px solid #e2e2e2;
+    background: #fff;
+    transition: transform 0.18s, box-shadow 0.18s;
+}
+
+.tasks-box #tasksContainer .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 36px rgba(0,0,0,0.14);
+}
+
+.tasks-box .card .card-body {
+    min-height: 170px;
+}

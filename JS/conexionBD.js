@@ -8,13 +8,14 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, '..', 'Public', 'views'))
+app.use(express.static(path.join(__dirname, '..', 'Public')));
 
 
 let conexion=mysql.createConnection({
     host:"localhost",
     database:"tareas",
     user:"root",
-    password:"",
+    password:"root",
 })
 
 conexion.connect(function(error){
